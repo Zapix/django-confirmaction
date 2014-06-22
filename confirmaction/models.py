@@ -44,7 +44,7 @@ class Action(models.Model):
         verbose_name=_("Action function"),
         max_length=255,
     )
-    confirm_code = models.CharField(
+    code_hash = models.CharField(
         verbose_name=_("Confirm code"),
         max_length=255
     )

@@ -89,7 +89,7 @@ def set_action(user_contact, func_addr, func_kwargs=None, message_template=None,
     action = models.Action.objects.create(
         user_contact=user_contact,
         action_func=func_addr,
-        confirm_code=SHA256.new(settings.SECRET_KEY + code).hexdigest(),
+        code_hash=SHA256.new(settings.SECRET_KEY + code).hexdigest(),
         live_time=live_time or app_settings.CODE_LIVE_TIME
     )
 
@@ -140,7 +140,7 @@ def apply_action(action_pk, code):
         raise exceptions.OutOfDate
 
     code_hash = SHA256.new(settings.SECRET_KEY + code).hexdigest()
-    if not action.confirm_code == code_hash:
+    if not action.code_hash == code_hash:
         raise exceptions.WrongCode
 
     if action.action_status != models.Action.NOT_CONFIRMED:

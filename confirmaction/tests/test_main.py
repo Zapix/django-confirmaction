@@ -85,7 +85,7 @@ class SetActionTestCase(test.TestCase):
             generate_code_func=gen_func
         )
         code_hash = SHA256.new(settings.SECRET_KEY + '2048').hexdigest()
-        self.assertEquals(action.confirm_code, code_hash)
+        self.assertEquals(action.code_hash, code_hash)
 
     def test_send_func(self):
         class TestException(Exception):
