@@ -54,3 +54,8 @@ docs/_build/
 
 # Idea ignore:
 .idea/*
+
+
+#pypi ignore
+.pypirc
+.pypirc.swp
