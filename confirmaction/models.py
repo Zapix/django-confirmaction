@@ -12,16 +12,6 @@ class Action(models.Model):
     """
     Model for action
     """
-    OUT_OF_DATE = -1
-    OPENED = 0
-    CONFIRMED = 1
-
-    CODE_STATUSES = (
-        (OUT_OF_DATE, _("Out of date")),
-        (OPENED, _("Opened")),
-        (CONFIRMED, _("Confirmed"))
-    )
-
     NOT_CONFIRMED = 0
     FINISHED_SUCCESS = 1
     WRONG_RETURNED_DATA = -1

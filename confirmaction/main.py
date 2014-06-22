@@ -116,6 +116,7 @@ def set_action(user_contact, func_addr, func_kwargs=None, message_template=None,
             render_to_string(message_template, template_context)
         )
     except Exception as e:
+        action.delete()
         raise exceptions.DidNotSendMessage(str(e))
 
     return action
