@@ -86,24 +86,6 @@ def set_action(user_contact, func_addr, func_kwargs=None, message_template=None,
 
     code = generate_code_func()
 
-    if send_code_func is None:
-        send_code_func = _import_func(app_settings.CONFIRM_SEND_METHOD)
-
-    message_template = (
-        message_template or app_settings.ACTIVATION_MESSAGE_TEMPLATE
-    )
-
-    template_context = template_context or {}
-    template_context.update({'code': code })
-
-    try:
-        send_code_func(
-            user_contact,
-            render_to_string(message_template, template_context)
-        )
-    except Exception as e:
-        raise exceptions.DidNotSendMessage(str(e))
-
     action = models.Action.objects.create(
         user_contact=user_contact,
         action_func=func_addr,
@@ -117,6 +99,25 @@ def set_action(user_contact, func_addr, func_kwargs=None, message_template=None,
             for key, value in func_kwargs.iteritems()
         ]
     )
+
+    if send_code_func is None:
+        send_code_func = _import_func(app_settings.CONFIRM_SEND_METHOD)
+
+    message_template = (
+        message_template or app_settings.ACTIVATION_MESSAGE_TEMPLATE
+    )
+
+    template_context = template_context or {}
+    template_context.update({'code': code})
+
+    try:
+        send_code_func(
+            user_contact,
+            render_to_string(message_template, template_context)
+        )
+    except Exception as e:
+        raise exceptions.DidNotSendMessage(str(e))
+
     return action
 
 
@@ -138,7 +139,8 @@ def apply_action(action_pk, code):
     if not action.is_actual():
         raise exceptions.OutOfDate
 
-    if not action.confirm_code == code:
+    code_hash = SHA256.new(settings.SECRET_KEY + code).hexdigest()
+    if not action.confirm_code == code_hash:
         raise exceptions.WrongCode
 
     if action.action_status != models.Action.NOT_CONFIRMED:

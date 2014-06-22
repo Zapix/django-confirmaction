@@ -4,7 +4,7 @@ import random
 
 from django.conf import settings
 
-logger = logging.getLogger('django')
+logger = logging.getLogger('confirmaction')
 
 
 def generate_code():

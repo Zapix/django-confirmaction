@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
-import datetime
-
 import mock
+from Crypto.Hash import SHA256
 
 from django import test
+from django.conf import settings
 
 from .. import models
 from .. import main
 from .. import exceptions
-from .. import settings
+from .. import settings as app_settings
 from ..decorators import confirm_action
 
 
@@ -84,7 +84,8 @@ class SetActionTestCase(test.TestCase):
             },
             generate_code_func=gen_func
         )
-        self.assertEquals(action.confirm_code, '2048')
+        code_hash = SHA256.new(settings.SECRET_KEY + '2048').hexdigest()
+        self.assertEquals(action.confirm_code, code_hash)
 
     def test_send_func(self):
         class TestException(Exception):
@@ -223,22 +224,22 @@ class ApplyActionTestCase(test.TestCase):
             main.apply_action(4096, '2048')
 
     def test_wrong_code_generator(self):
-        original = settings.CONFIRM_GENERATION
-        settings.CONFIRM_GENERATION = 'asdfasdf.asdf'
+        original = app_settings.CONFIRM_GENERATION
+        app_settings.CONFIRM_GENERATION = 'asdfasdf.asdf'
         with self.assertRaises(ValueError):
             main.set_action(
                 'zap@land.ru',
                 'confirmaction.tests.test_main.simple_action'
             )
-        settings.CONFIRM_GENERATION = original
+        app_settings.CONFIRM_GENERATION = original
 
     def test_wrong_send_method(self):
-        original = settings.CONFIRM_SEND_METHOD
-        settings.CONFIRM_SEND_METHOD= 'asdfasdf.asdf'
+        original = app_settings.CONFIRM_SEND_METHOD
+        app_settings.CONFIRM_SEND_METHOD= 'asdfasdf.asdf'
         with self.assertRaises(ValueError):
             main.set_action(
                 '+79625213997',
                 'confirmaction.tests.test_main.simple_action'
             )
-        settings.CONFIRM_SEND_METHOD = original
+        app_settings.CONFIRM_SEND_METHOD = original
 
