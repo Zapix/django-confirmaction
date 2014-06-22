@@ -119,7 +119,7 @@ def set_action(user_contact, func_addr, func_kwargs=None, message_template=None,
         action.delete()
         raise exceptions.DidNotSendMessage(str(e))
 
-    return action
+    return action.pk
 
 
 def apply_action(action_pk, code):

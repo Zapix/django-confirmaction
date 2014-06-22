@@ -50,7 +50,7 @@ class SetActionTestCase(test.TestCase):
             main.set_action('+7911', 'inspect.isfunction', {})
 
     def test_all_ok(self):
-        action = main.set_action(
+        action_pk = main.set_action(
             '+7911',
             'confirmaction.tests.test_main.simple_action',
             {
@@ -58,10 +58,10 @@ class SetActionTestCase(test.TestCase):
                 'param_second': 4
             }
         )
-        self.assertIsNotNone(action.pk)
+        self.assertIsNotNone(models.Action.objects.get(pk=action_pk))
 
     def test_live_time(self):
-        action = main.set_action(
+        action_pk= main.set_action(
             '+7911',
             'confirmaction.tests.test_main.simple_action',
             {
@@ -70,12 +70,13 @@ class SetActionTestCase(test.TestCase):
             },
             live_time=15
         )
+        action = models.Action.objects.get(pk=action_pk)
         self.assertEquals(action.live_time, 15)
 
     def test_generation_func(self):
         gen_func = lambda: '2048'
 
-        action = main.set_action(
+        action_pk = main.set_action(
             '+7911',
             'confirmaction.tests.test_main.simple_action',
             {
@@ -85,6 +86,7 @@ class SetActionTestCase(test.TestCase):
             generate_code_func=gen_func
         )
         code_hash = SHA256.new(settings.SECRET_KEY + '2048').hexdigest()
+        action = models.Action.objects.get(pk=action_pk)
         self.assertEquals(action.code_hash, code_hash)
 
     def test_send_func(self):
@@ -109,7 +111,7 @@ class SetActionTestCase(test.TestCase):
 class ApplyActionTestCase(test.TestCase):
 
     def test_wrong_code(self):
-        action = main.set_action(
+        action_pk = main.set_action(
             'zap@land.ru',
             'confirmaction.tests.test_main.simple_action',
             {
@@ -119,11 +121,11 @@ class ApplyActionTestCase(test.TestCase):
         )
 
         with self.assertRaises(exceptions.WrongCode):
-            main.apply_action(action.pk, '3482332')
+            main.apply_action(action_pk, '3482332')
 
     def test_used_code(self):
         gen_func = lambda: '2048'
-        action = main.set_action(
+        action_pk = main.set_action(
             'zap@land.ru',
             'confirmaction.tests.test_main.simple_action',
             {
@@ -133,15 +135,15 @@ class ApplyActionTestCase(test.TestCase):
             generate_code_func=gen_func
         )
 
-        main.apply_action(action.pk, '2048')
+        main.apply_action(action_pk, '2048')
 
         with self.assertRaises(exceptions.UsedAction):
-            main.apply_action(action.pk, '2048')
+            main.apply_action(action_pk, '2048')
 
     def test_out_of_date(self):
         gen_func = lambda: '2048'
 
-        action = main.set_action(
+        action_pk = main.set_action(
             'zap@land.ru',
             'confirmaction.tests.test_main.simple_action',
             {
@@ -155,11 +157,11 @@ class ApplyActionTestCase(test.TestCase):
         with mock.patch('confirmaction.models.Action.is_actual') as mock_meth:
             mock_meth.return_value = False
             with self.assertRaises(exceptions.OutOfDate):
-                main.apply_action(action.pk, '2048')
+                main.apply_action(action_pk, '2048')
 
     def test_action_done(self):
         gen_func = lambda: '2048'
-        action = main.set_action(
+        action_pk = main.set_action(
             'zap@land.ru',
             'confirmaction.tests.test_main.simple_action',
             {
@@ -169,7 +171,7 @@ class ApplyActionTestCase(test.TestCase):
             generate_code_func=gen_func
         )
 
-        status, data = main.apply_action(action.pk, '2048')
+        status, data = main.apply_action(action_pk, '2048')
 
         self.assertIn('status', data)
 
@@ -177,39 +179,39 @@ class ApplyActionTestCase(test.TestCase):
 
     def test_action_error_during_process(self):
         gen_func = lambda: '2048'
-        action = main.set_action(
+        action_pk = main.set_action(
             'zap@land.ru',
             'confirmaction.tests.test_main.error_during_process',
             generate_code_func=gen_func
         )
 
-        status, data = main.apply_action(action.pk, '2048')
+        status, data = main.apply_action(action_pk, '2048')
 
         self.assertIn('error', data)
         self.assertEquals(status, models.Action.ERROR_DURING_PROCESS)
 
     def test_action_system_fault(self):
         gen_func = lambda: '2048'
-        action = main.set_action(
+        action_pk = main.set_action(
             'zap@land.ru',
             'confirmaction.tests.test_main.system_fault',
             generate_code_func=gen_func
         )
 
-        status, data = main.apply_action(action.pk, '2048')
+        status, data = main.apply_action(action_pk, '2048')
 
         self.assertIn('error', data)
         self.assertEquals(status, models.Action.ACTION_FAULT)
 
     def test_action_wrong_data_returned(self):
         gen_func = lambda: '2048'
-        action = main.set_action(
+        action_pk = main.set_action(
             '+8952342343',
             'confirmaction.tests.test_main.wrong_data_return',
             generate_code_func=gen_func
         )
 
-        status, data = main.apply_action(action.pk, '2048')
+        status, data = main.apply_action(action_pk, '2048')
 
         self.assertIn('error', data)
         self.assertEquals(status, models.Action.WRONG_RETURNED_DATA)
