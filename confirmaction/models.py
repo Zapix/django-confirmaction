@@ -66,6 +66,12 @@ class Action(models.Model):
         blank=True,
         null=True
     )
+    scope = models.CharField(
+        verbose_name='scope',
+        max_length=255,
+        blank=True,
+        null=True
+    )
 
     def is_actual(self):
         return timezone.now() < self.created + datetime.timedelta(

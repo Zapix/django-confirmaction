@@ -76,3 +76,13 @@ class DidNotSendMessage(Exception):
     def __str__(self):
         return self.value
 
+
+class WrongScopeException(Exception):
+    """
+    Error raises when use tries to use wrong scope for action
+    """
+    def __init__(self, scope):
+        self.scope = scope
+
+    def __str__(self):
+        return '%s is a wrong scope' % self.scope

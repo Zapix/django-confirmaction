@@ -44,8 +44,8 @@ def get_action_func(func_addr):
     return func
 
 
-def set_action(user_contact, func_addr, func_kwargs=None, message_template=None,
-               template_context=None, live_time=None,
+def set_action(user_contact, func_addr, func_kwargs=None, scope=None,
+               message_template=None, template_context=None, live_time=None,
                generate_code_func=None, send_code_func=None):
     """
     Sets an action. Checks that func_addr - is string with address of function
@@ -89,6 +89,7 @@ def set_action(user_contact, func_addr, func_kwargs=None, message_template=None,
     action = models.Action.objects.create(
         user_contact=user_contact,
         action_func=func_addr,
+        scope=scope,
         code_hash=SHA256.new(settings.SECRET_KEY + code).hexdigest(),
         live_time=live_time or app_settings.CODE_LIVE_TIME
     )
@@ -122,7 +123,7 @@ def set_action(user_contact, func_addr, func_kwargs=None, message_template=None,
     return action.pk
 
 
-def apply_action(action_pk, code):
+def apply_action(action_pk, code, scope=None):
     """
     Applies action if code is correct and not out of date and is opened
     If it is out of date raise OutOfDate exception.
@@ -136,6 +137,14 @@ def apply_action(action_pk, code):
         action = models.Action.objects.get(pk=action_pk)
     except models.Action.DoesNotExist:
         raise exceptions.CantFindAction(action_pk)
+
+    print action.scope
+    if (
+        action.scope is None and not scope is None or
+        not action.scope is None and scope is None or
+        not action.scope is None and not scope is None and action.scope != scope
+    ):
+        raise exceptions.WrongScopeException(scope or 'None')
 
     if not action.is_actual():
         raise exceptions.OutOfDate

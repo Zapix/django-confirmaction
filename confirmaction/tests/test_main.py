@@ -245,3 +245,25 @@ class ApplyActionTestCase(test.TestCase):
             )
         app_settings.CONFIRM_SEND_METHOD = original
 
+    def test_wrong_scope(self):
+        action_pk = main.set_action(
+            'zap@land.ru',
+            'confirmaction.tests.test_main.simple_action',
+            {'param_first': 1, 'param_second': 2},
+            scope='scope1',
+            generate_code_func=lambda: '2048'
+        )
+        with self.assertRaises(exceptions.WrongScopeException):
+            main.apply_action(action_pk, '2048', scope='scope2')
+
+    def test_all_ok_with_scope(self):
+        action_pk = main.set_action(
+            'zap@land.ru',
+            'confirmaction.tests.test_main.simple_action',
+            {'param_first': 1, 'param_second': 2},
+            scope='scope1',
+            generate_code_func=lambda: '2048'
+        )
+        status, result = main.apply_action(action_pk, '2048', scope='scope1')
+        self.assertEquals(status, models.Action.FINISHED_SUCCESS)
+

@@ -15,9 +15,9 @@ User = get_user_model()
 @confirm_action
 def activate_user_phone(user_pk):
     user = User.objects.get(pk=user_pk)
-    user.is_phone_active = True
+    user.is_active = True
     user.save()
-    return {'message': 'Phone active'}
+    return {'message': 'User is active'}
 
 
 
@@ -54,12 +54,13 @@ class ConfirmActionTestCase(APITestCase):
 
     def test_all_ok(self):
         user = User.objects.create(
-            name='test',
-            phone='+79625213997',
-            password='test'
+            username='test',
+            email='test@test.ru',
+            password='test',
+            is_active=False
         )
         action_pk = set_action(
-            user.phone,
+            user.email,
             'confirmaction.tests.test_view.activate_user_phone',
             {'user_pk': user.pk},
             generate_code_func=lambda: '2048'
@@ -72,4 +73,4 @@ class ConfirmActionTestCase(APITestCase):
         self.assertEquals(response.status_code, status.HTTP_200_OK)
 
         user = User.objects.get(pk=user.pk)
-        self.assertTrue(user.is_phone_active)
+        self.assertTrue(user.is_active)
