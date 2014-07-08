@@ -11,7 +11,7 @@ CONFIRM_GENERATION = getattr(
 CONFIRM_SEND_METHOD = getattr(
     settings,
     'CONFIRM_SEND_METHOD',
-    'confirmaction.utils.send_code'
+    'confirmaction.utils.log_send_code'
 )
 
 CODE_LIVE_TIME = getattr(

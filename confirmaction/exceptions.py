@@ -1,7 +1,25 @@
 # -*- coding: utf-8 -*-
 
 
-class NotActionException(Exception):
+class BaseConfirmActionException(Exception):
+    """
+    Base class for all exceptions raised in django-confirmaction
+    """
+    def __init__(self, value):
+        self.value = value
+
+    def __str__(self):
+        return self.value
+
+
+class OnCreateActionError(BaseConfirmActionException):
+    """
+    Exception raises before action set
+    """
+    pass
+
+
+class NotActionException(OnCreateActionError):
     """
     Error raises when passed function not an action.
     """
@@ -12,48 +30,68 @@ class NotActionException(Exception):
         return self.value
 
 
-class CantFindAction(Exception):
+class DidNotSendMessage(OnCreateActionError):
     """
-    Error raises when can't find action with specia identifier
+    Error raises when can't send action for some reasons.
     """
-    def __init__(self, value):
-        self.value = value
-
-    def __str__(self):
-        return "Cant find action with identifier %d " % self.value
 
 
-class WrongDataReturn(Exception):
+class OnConfirmActionError(BaseConfirmActionException):
     """
-    Error raises when return data of function not dict
+    Base class for errors raises when confirm action
     """
-    def __str__(self):
-        return "Action should return only dict"
 
 
-class OutOfDate(Exception):
+class ValidateActionError(OnConfirmActionError):
+    """
+    Base class for errors raises when validate action and code
+    """
+
+
+class CantFindAction(ValidateActionError):
+    """
+    Error raises when can't find action by path
+    """
+    pass
+
+
+class OutOfDate(ValidateActionError):
     """
     Raise exception when tries to start old action
     """
-    def __str__(self):
-        return "Action out of date"
 
 
-class WrongCode(Exception):
+class WrongCode(ValidateActionError):
     """
     Raises exception when somebody used wrong code
     """
-    def __str__(self):
-        return "Wrong code"
 
 
-class UsedAction(Exception):
+class UsedAction(ValidateActionError):
     """
     Raises exception when somebody tries to apply wrong code
     """
 
 
-class ErrorDuringProcess(Exception):
+class WrongScopeException(ValidateActionError):
+    """
+    Error raises when use tries to use wrong scope for action
+    """
+
+
+class ProcessActionError(OnConfirmActionError):
+    """
+    Raises when happened error during process action
+    """
+
+
+class WrongDataReturned(ProcessActionError):
+    """
+    Error raises when return data of function not dict
+    """
+
+
+class ErrorDuringProcess(ProcessActionError):
     # TODO: add value
     """
     Error raised in action if something goes wrong in action.
@@ -66,23 +104,7 @@ class ErrorDuringProcess(Exception):
     """
 
 
-class DidNotSendMessage(Exception):
+class SystemFaultError(ProcessActionError):
     """
-    Error raises when passed function not an action.
+    Raises when catches some error during process action
     """
-    def __init__(self, value):
-        self.value = value
-
-    def __str__(self):
-        return self.value
-
-
-class WrongScopeException(Exception):
-    """
-    Error raises when use tries to use wrong scope for action
-    """
-    def __init__(self, scope):
-        self.scope = scope
-
-    def __str__(self):
-        return '%s is a wrong scope' % self.scope

@@ -96,7 +96,7 @@ def set_action(user_contact, func_addr, func_kwargs=None, scope=None,
 
     models.ActionArg.objects.bulk_create(
         [
-            models.ActionArg(action=action, name=str(key), value=str(value))
+            models.ActionArg(action=action, name=key, value=value)
             for key, value in func_kwargs.iteritems()
         ]
     )
@@ -136,44 +136,57 @@ def apply_action(action_pk, code, scope=None):
     try:
         action = models.Action.objects.get(pk=action_pk)
     except models.Action.DoesNotExist:
-        raise exceptions.CantFindAction(action_pk)
+        raise exceptions.CantFindAction(
+            "Can't find action with pk %d" % action_pk
+        )
 
-    print action.scope
     if (
         action.scope is None and not scope is None or
         not action.scope is None and scope is None or
         not action.scope is None and not scope is None and action.scope != scope
     ):
-        raise exceptions.WrongScopeException(scope or 'None')
+        raise exceptions.WrongScopeException(
+            "%s is a wrong scope" % (action.scope or "Default")
+        )
 
     if not action.is_actual():
-        raise exceptions.OutOfDate
+        raise exceptions.OutOfDate("Action is out of date")
 
     code_hash = SHA256.new(settings.SECRET_KEY + code).hexdigest()
     if not action.code_hash == code_hash:
-        raise exceptions.WrongCode
+        raise exceptions.WrongCode("Wrong code")
 
     if action.action_status != models.Action.NOT_CONFIRMED:
-        raise exceptions.UsedAction
+        raise exceptions.UsedAction("Used action")
 
     func = get_action_func(action.action_func)
     try:
         data = func(**action.get_kwargs())
-    except exceptions.ErrorDuringProcess as e:
+    except (exceptions.ErrorDuringProcess, Exception) as e:
         action.action_status = models.Action.ERROR_DURING_PROCESS
-        data = {'error': action.get_action_status_display()}
-    except Exception as e:
-        action.action_status = models.Action.ACTION_FAULT
-        data = {'error': action.get_action_status_display()}
+        action.result = str(e)
+        action.save()
+        if isinstance(e, exceptions.ErrorDuringProcess):
+            raise exceptions.ErrorDuringProcess(str(e))
+        else:
+            raise exceptions.SystemFaultError(str(e))
     else:
         if not isinstance(data, dict):
             action.action_status = models.Action.WRONG_RETURNED_DATA
-            data = {'error': action.get_action_status_display()}
-        else:
-            action.action_status = models.Action.FINISHED_SUCCESS
-    finally:
-        action.result = json.dumps(data)
+            action.save()
+            raise exceptions.WrongDataReturned(
+                "Action should return serializable dict"
+            )
+        try:
+            action.result = json.dumps(data)
+        except ValueError:
+            action.action_status = models.Action.WRONG_RETURNED_DATA
+            action.save()
+            raise exceptions.WrongDataReturned(
+                "Action should return serializable dict"
+            )
+        action.action_status = models.Action.FINISHED_SUCCESS
         action.save()
 
-    return action.action_status, data
+    return data
 

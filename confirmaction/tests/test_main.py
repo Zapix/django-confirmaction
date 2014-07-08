@@ -19,7 +19,7 @@ def simple_action(param_first, param_second):
 
 @confirm_action
 def error_during_process():
-    raise exceptions.ErrorDuringProcess
+    raise exceptions.ErrorDuringProcess("Some error")
 
 
 @confirm_action
@@ -171,11 +171,8 @@ class ApplyActionTestCase(test.TestCase):
             generate_code_func=gen_func
         )
 
-        status, data = main.apply_action(action_pk, '2048')
-
+        data = main.apply_action(action_pk, '2048')
         self.assertIn('status', data)
-
-        self.assertEquals(status, models.Action.FINISHED_SUCCESS)
 
     def test_action_error_during_process(self):
         gen_func = lambda: '2048'
@@ -185,10 +182,8 @@ class ApplyActionTestCase(test.TestCase):
             generate_code_func=gen_func
         )
 
-        status, data = main.apply_action(action_pk, '2048')
-
-        self.assertIn('error', data)
-        self.assertEquals(status, models.Action.ERROR_DURING_PROCESS)
+        with self.assertRaises(exceptions.ErrorDuringProcess):
+            main.apply_action(action_pk, '2048')
 
     def test_action_system_fault(self):
         gen_func = lambda: '2048'
@@ -198,10 +193,8 @@ class ApplyActionTestCase(test.TestCase):
             generate_code_func=gen_func
         )
 
-        status, data = main.apply_action(action_pk, '2048')
-
-        self.assertIn('error', data)
-        self.assertEquals(status, models.Action.ACTION_FAULT)
+        with self.assertRaises(exceptions.SystemFaultError):
+            main.apply_action(action_pk, '2048')
 
     def test_action_wrong_data_returned(self):
         gen_func = lambda: '2048'
@@ -211,10 +204,9 @@ class ApplyActionTestCase(test.TestCase):
             generate_code_func=gen_func
         )
 
-        status, data = main.apply_action(action_pk, '2048')
+        with self.assertRaises(exceptions.WrongDataReturned):
+            main.apply_action(action_pk, '2048')
 
-        self.assertIn('error', data)
-        self.assertEquals(status, models.Action.WRONG_RETURNED_DATA)
 
     def test_cant_find_action(self):
         main.set_action(
@@ -264,6 +256,5 @@ class ApplyActionTestCase(test.TestCase):
             scope='scope1',
             generate_code_func=lambda: '2048'
         )
-        status, result = main.apply_action(action_pk, '2048', scope='scope1')
-        self.assertEquals(status, models.Action.FINISHED_SUCCESS)
+        result = main.apply_action(action_pk, '2048', scope='scope1')
 
