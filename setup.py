@@ -30,6 +30,12 @@ setup(
         'confirmaction.migrations'
     ],
     long_description=long_description(),
+    install_requires=[
+        'django>=1.6',
+        'south>=0.8.4',
+        'mock',
+        'pycrypto'
+    ],
     classifiers=[
         "Development Status :: 2 - Pre-Alpha",
         "Framework :: Django",
