@@ -92,7 +92,6 @@ class WrongDataReturned(ProcessActionError):
 
 
 class ErrorDuringProcess(ProcessActionError):
-    # TODO: add value
     """
     Error raised in action if something goes wrong in action.
 

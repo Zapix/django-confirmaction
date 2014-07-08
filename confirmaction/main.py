@@ -163,12 +163,12 @@ def apply_action(action_pk, code, scope=None):
     try:
         data = func(**action.get_kwargs())
     except (exceptions.ErrorDuringProcess, Exception) as e:
-        action.action_status = models.Action.ERROR_DURING_PROCESS
         action.result = str(e)
-        action.save()
         if isinstance(e, exceptions.ErrorDuringProcess):
             raise exceptions.ErrorDuringProcess(str(e))
         else:
+            action.action_status = models.Action.ACTION_FAULT
+            action.save()
             raise exceptions.SystemFaultError(str(e))
     else:
         if not isinstance(data, dict):
