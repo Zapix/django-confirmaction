@@ -17,7 +17,7 @@ def long_description():
 
 setup(
     name = "django-confirmaction",
-    version = "0.0.2",
+    version = "0.0.3",
     author = "Aleksandr Aibulatov",
     author_email = "zap.aibulatov@gmail.com",
     description = "Django battery for confirm some action via email, sms, etc",
