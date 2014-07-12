@@ -5,11 +5,11 @@ from Crypto.Hash import SHA256
 from django import test
 from django.conf import settings
 
-from .. import models
-from .. import main
-from .. import exceptions
-from .. import settings as app_settings
-from ..decorators import confirm_action
+from confirmaction import models
+from confirmaction import main
+from confirmaction import exceptions
+from confirmaction import settings as app_settings
+from confirmaction.decorators import confirm_action
 
 
 @confirm_action
@@ -52,7 +52,7 @@ class SetActionTestCase(test.TestCase):
     def test_all_ok(self):
         action_pk = main.set_action(
             '+7911',
-            'confirmaction.tests.test_main.simple_action',
+            'tests.test_main.simple_action',
             {
                 'param_first': 'test',
                 'param_second': 4
@@ -63,7 +63,7 @@ class SetActionTestCase(test.TestCase):
     def test_live_time(self):
         action_pk= main.set_action(
             '+7911',
-            'confirmaction.tests.test_main.simple_action',
+            'tests.test_main.simple_action',
             {
                 'param_first': 'test',
                 'param_second': 4
@@ -78,7 +78,7 @@ class SetActionTestCase(test.TestCase):
 
         action_pk = main.set_action(
             '+7911',
-            'confirmaction.tests.test_main.simple_action',
+            'tests.test_main.simple_action',
             {
                 'param_first': 'test',
                 'param_second': 4
@@ -99,7 +99,7 @@ class SetActionTestCase(test.TestCase):
         with self.assertRaises(exceptions.DidNotSendMessage):
             main.set_action(
                 '+7911',
-                'confirmaction.tests.test_main.simple_action',
+                'tests.test_main.simple_action',
                 {
                     'param_first': 'test',
                     'param_second': 4
@@ -113,7 +113,7 @@ class ApplyActionTestCase(test.TestCase):
     def test_wrong_code(self):
         action_pk = main.set_action(
             'zap@land.ru',
-            'confirmaction.tests.test_main.simple_action',
+            'tests.test_main.simple_action',
             {
                 'param_first': 'test',
                 'param_second': 'param'
@@ -127,7 +127,7 @@ class ApplyActionTestCase(test.TestCase):
         gen_func = lambda: '2048'
         action_pk = main.set_action(
             'zap@land.ru',
-            'confirmaction.tests.test_main.simple_action',
+            'tests.test_main.simple_action',
             {
                 'param_first': 'test',
                 'param_second': 'param'
@@ -145,7 +145,7 @@ class ApplyActionTestCase(test.TestCase):
 
         action_pk = main.set_action(
             'zap@land.ru',
-            'confirmaction.tests.test_main.simple_action',
+            'tests.test_main.simple_action',
             {
                 'param_first': 'test',
                 'param_second': 'param'
@@ -163,7 +163,7 @@ class ApplyActionTestCase(test.TestCase):
         gen_func = lambda: '2048'
         action_pk = main.set_action(
             'zap@land.ru',
-            'confirmaction.tests.test_main.simple_action',
+            'tests.test_main.simple_action',
             {
                 'param_first': 'test',
                 'param_second': 'param'
@@ -178,7 +178,7 @@ class ApplyActionTestCase(test.TestCase):
         gen_func = lambda: '2048'
         action_pk = main.set_action(
             'zap@land.ru',
-            'confirmaction.tests.test_main.error_during_process',
+            'tests.test_main.error_during_process',
             generate_code_func=gen_func
         )
 
@@ -189,7 +189,7 @@ class ApplyActionTestCase(test.TestCase):
         gen_func = lambda: '2048'
         action_pk = main.set_action(
             'zap@land.ru',
-            'confirmaction.tests.test_main.system_fault',
+            'tests.test_main.system_fault',
             generate_code_func=gen_func
         )
 
@@ -200,7 +200,7 @@ class ApplyActionTestCase(test.TestCase):
         gen_func = lambda: '2048'
         action_pk = main.set_action(
             '+8952342343',
-            'confirmaction.tests.test_main.wrong_data_return',
+            'tests.test_main.wrong_data_return',
             generate_code_func=gen_func
         )
 
@@ -211,7 +211,7 @@ class ApplyActionTestCase(test.TestCase):
     def test_cant_find_action(self):
         main.set_action(
             'zap@land.ru',
-            'confirmaction.tests.test_main.simple_action',
+            'tests.test_main.simple_action',
         )
 
         with self.assertRaises(exceptions.CantFindAction):
@@ -223,7 +223,7 @@ class ApplyActionTestCase(test.TestCase):
         with self.assertRaises(ValueError):
             main.set_action(
                 'zap@land.ru',
-                'confirmaction.tests.test_main.simple_action'
+                'tests.test_main.simple_action'
             )
         app_settings.CONFIRM_GENERATION = original
 
@@ -233,14 +233,14 @@ class ApplyActionTestCase(test.TestCase):
         with self.assertRaises(ValueError):
             main.set_action(
                 '+79625213997',
-                'confirmaction.tests.test_main.simple_action'
+                'tests.test_main.simple_action'
             )
         app_settings.CONFIRM_SEND_METHOD = original
 
     def test_wrong_scope(self):
         action_pk = main.set_action(
             'zap@land.ru',
-            'confirmaction.tests.test_main.simple_action',
+            'tests.test_main.simple_action',
             {'param_first': 1, 'param_second': 2},
             scope='scope1',
             generate_code_func=lambda: '2048'
@@ -251,7 +251,7 @@ class ApplyActionTestCase(test.TestCase):
     def test_all_ok_with_scope(self):
         action_pk = main.set_action(
             'zap@land.ru',
-            'confirmaction.tests.test_main.simple_action',
+            'tests.test_main.simple_action',
             {'param_first': 1, 'param_second': 2},
             scope='scope1',
             generate_code_func=lambda: '2048'

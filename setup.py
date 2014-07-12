@@ -26,14 +26,12 @@ setup(
     url = "https://github.com/Zapix/django-confirmaction",
     packages=[
         'confirmaction',
-        'confirmaction.tests',
         'confirmaction.migrations'
     ],
     long_description=long_description(),
     install_requires=[
         'django>=1.6',
         'south>=0.8.4',
-        'mock',
         'pycrypto'
     ],
     classifiers=[
