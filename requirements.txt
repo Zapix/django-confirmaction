@@ -1,4 +1,7 @@
 South==0.8.4
 mock==1.0.1
+py==1.4.20
 pycrypto==2.6.1
+pytest==2.5.2
+pytest-django==2.6.2
 wsgiref==0.1.2
