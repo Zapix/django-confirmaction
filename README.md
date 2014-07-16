@@ -10,7 +10,7 @@ Django module for confirm actions via sending email/sms or etc.
 Installation
 ------------
 
-You can install via PyPi_ or direct from the github_ repo.
+You can install via PyPi or direct from the github repo.
 
 To install with pip::
 
