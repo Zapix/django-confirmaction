@@ -10,14 +10,14 @@ Installation
 
 You can install via PyPi or direct from the github repo.
 
-To install with pip::
+To install with pip
 
-    $ pip install django-choices
+    $ pip install django-confirmaction
 
 Basic usage
 -----------
 
-To start working please add this `confirmaction` in INSTALLED_APPS::
+To start working please add this `confirmaction` in INSTALLED_APPS
 
     INSTALLED_APPS = (
         ...
@@ -26,19 +26,19 @@ To start working please add this `confirmaction` in INSTALLED_APPS::
     )
 
 Create a function for sending activation code. Function should have 2 parameters
-user_contact, and message. For example in module `myapp.sending` create function for send message::
+user_contact, and message. For example in module `myapp.sending` create function for send message
 
     def send_message(user_contact, message):
         print "Contact:", user_contact
         print "Message:", message
 
-Set sending function on settings.py::
+Set sending function on settings.py
 
     CONFIRM_SEND_METHOD = 'myapp.sending.send_message'
 
 Create an action. Action it is a function decorated with `confirm_action`.
 Function can have string parameters, and should return dict which can json-serializable
-For example create action in module myapp.actions::
+For example create action in module myapp.actions
 
 
     from confirmcation import confirm_action
@@ -53,7 +53,7 @@ For example create action in module myapp.actions::
             'user_pk': user_pk
         }
 
-Create a view where code will be send. For sending code use `confirmaction.set_action`::
+Create a view where code will be send. For sending code use `confirmaction.set_action`
 
     from confirmaction import set_action
 
@@ -67,7 +67,7 @@ Create a view where code will be send. For sending code use `confirmaction.set_a
         )
         ...
 
-Create a view where action will be confirm::
+Create a view where action will be confirm
 
     from confirmaction import apply_action
 
