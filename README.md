@@ -1,4 +1,3 @@
-====================
 django-confirmaction
 ====================
 
@@ -6,7 +5,6 @@ django-confirmaction
 
 Django module for confirm actions via sending email/sms or etc.
 
-------------
 Installation
 ------------
 
@@ -16,11 +14,10 @@ To install with pip::
 
     $ pip install django-choices
 
------------
 Basic usage
 -----------
 
-1. To start working please add this module in INSTALLED_APPS::
+To start working please add this `confirmaction` in INSTALLED_APPS::
 
     INSTALLED_APPS = (
         ...
@@ -28,20 +25,21 @@ Basic usage
         ...
     )
 
-2. Create a function for sending activation code. Function should have 2 parameters
+Create a function for sending activation code. Function should have 2 parameters
 user_contact, and message. For example in module `myapp.sending` create function for send message::
 
     def send_message(user_contact, message):
         print "Contact:", user_contact
         print "Message:", message
 
-3. Set sending function on settings.py::
+Set sending function on settings.py::
 
     CONFIRM_SEND_METHOD = 'myapp.sending.send_message'
 
-4. Create an action. Action it is a function decorated with `confirm_action`.
+Create an action. Action it is a function decorated with `confirm_action`.
 Function can have string parameters, and should return dict which can json-serializable
 For example create action in module myapp.actions::
+
 
     from confirmcation import confirm_action
 
@@ -55,7 +53,7 @@ For example create action in module myapp.actions::
             'user_pk': user_pk
         }
 
-5. Create a view where code will be send. For sending code use `confirmaction.set_action`::
+Create a view where code will be send. For sending code use `confirmaction.set_action`::
 
     from confirmaction import set_action
 
@@ -69,7 +67,7 @@ For example create action in module myapp.actions::
         )
         ...
 
-6. Create a view where action will be confirm::
+Create a view where action will be confirm::
 
     from confirmaction import apply_action
 
@@ -82,4 +80,4 @@ For example create action in module myapp.actions::
         #handle result
         .....
 
-7. Use it :)
+Use it :)
