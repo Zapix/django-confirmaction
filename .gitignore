@@ -60,5 +60,6 @@ docs/_build/
 .pypirc
 .pypirc.swp
 
-# ignore testproject
-testconfirmaction/*
+
+# Ignore docs/build
+docs/build/
